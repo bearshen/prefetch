@@ -20,41 +20,36 @@ struct RPT {
     u_int32_t prev_addr;
     u_int32_t stride;
     u_int32_t state;
-} // reference prediction table.
+} ;// reference prediction table.
+
 
 class Prefetcher {
     private:
         int num_requests;
+        int num_rpt;
         Request requests[NUM_MAX_REQUESTS];
         RPT rpt[NUM_RPT_ENTRIES];
         int current_pending_request;
+        int rear_request;
         int num_strides_prefetched = 2;
     public:
-        Prefetcher() {num_requests = 0; current_pending_request = 0;}
+        Prefetcher();
 
         // should return true if a request is ready for this cycle
-        bool hasRequest(u_int32_t cycle) { 
-            if (num_requests > 0) return true;
-            else return false;
-        }
+        bool hasRequest(u_int32_t cycle);
 
         // request a desired address be brought in
-        Request getRequest(u_int32_t cycle) { 
-			return requests[current_pending_request];
-			num_requests --;
-			current_pending_request = (current_pending_request + 1) % NUM_MAX_REQUESTS;
-		}
+        Request getRequest(u_int32_t cycle);
 
         // this function is called whenever the last prefetcher request was successfully sent to the L2
-        void completeRequest(u_int32_t cycle); {}
+        void completeRequest(u_int32_t cycle);
 
        /*
         * This function is called whenever the CPU references memory.
         * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
         */
-       void cpuRequest(Request req) {
-			
-	   }
+       void cpuRequest(Request req);
+       bool isFull();
     };
 
 #endif
