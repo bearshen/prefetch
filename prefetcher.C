@@ -19,15 +19,16 @@ bool Prefetcher::hasRequest(u_int32_t cycle) {
  }
 
 Request Prefetcher::getRequest(u_int32_t cycle) { 
+
 	return requests[current_pending_request];
-	num_requests --;
-	current_pending_request = (current_pending_request + 1) % NUM_MAX_REQUESTS;
+	
 }
 
 
 void Prefetcher::completeRequest(u_int32_t cycle) { 
 
-	current_pending_request = rear_request = 0;
+	num_requests --;
+	current_pending_request = (current_pending_request + 1) % NUM_MAX_REQUESTS;
 }
 
 void Prefetcher::cpuRequest(Request req) { 
@@ -39,13 +40,19 @@ void Prefetcher::cpuRequest(Request req) {
 	}
 
 	if(index != -1){
+		//u_int32_t temp_stride = rpt[index].stride;
 		rpt[index].stride = req.addr - rpt[index].prev_addr;
 		rpt[index].prev_addr = req.addr;
-		u_int32_t temp_addr = req.addr + rpt[index].stride * num_strides_prefetched;
-		if( !isFull() ){
-			requests[rear_request].addr = temp_addr;
-			rear_request = (rear_request+1) % NUM_MAX_REQUESTS;
+		for (int n = 1; n < num_strides_prefetched + 1; n++){
+			u_int32_t temp_addr = req.addr + rpt[index].stride *n;
+			if( !isFull() ){
+				requests[rear_request].addr = temp_addr;
+				rear_request = (rear_request+1) % NUM_MAX_REQUESTS;
+				num_requests++;
+				//printf("%d\n", num_requests );
+			}
 		}
+		
 		
 	}
 
@@ -54,9 +61,16 @@ void Prefetcher::cpuRequest(Request req) {
 			rpt[num_rpt].pc = req.pc;
 			rpt[num_rpt].prev_addr = req.addr;
 			rpt[num_rpt].stride = 0;
+			num_rpt++;
+		}
+		u_int32_t temp_addr = req.addr + 16;
+		if( !isFull() ){
+			requests[rear_request].addr = temp_addr;
+			rear_request = (rear_request+1) % NUM_MAX_REQUESTS;
+			num_requests++;
+			//printf("%d\n", num_requests );
 		}
 		
-
 	}
 	
 
