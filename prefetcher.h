@@ -28,7 +28,7 @@ class Prefetcher {
         Request requests[NUM_MAX_REQUESTS];
         RPT rpt[NUM_RPT_ENTRIES];
         int current_pending_request;
-        int num_strides = 2;
+        int num_strides_prefetched = 2;
     public:
         Prefetcher() {num_requests = 0; current_pending_request = 0;}
 
@@ -39,16 +39,22 @@ class Prefetcher {
         }
 
         // request a desired address be brought in
-        Request getRequest(u_int32_t cycle) {
+        Request getRequest(u_int32_t cycle) { 
+			return requests[current_pending_request];
+			num_requests --;
+			current_pending_request = (current_pending_request + 1) % NUM_MAX_REQUESTS;
+		}
 
-            // this function is called whenever the last prefetcher request was successfully sent to the L2
-            void completeRequest(u_int32_t cycle);
+        // this function is called whenever the last prefetcher request was successfully sent to the L2
+        void completeRequest(u_int32_t cycle); {}
 
-            /*
-             * This function is called whenever the CPU references memory.
-             * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
-             */
-            void cpuRequest(Request req); 
-        };
+       /*
+        * This function is called whenever the CPU references memory.
+        * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
+        */
+       void cpuRequest(Request req) {
+			
+	   }
+    };
 
 #endif
