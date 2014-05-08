@@ -16,11 +16,11 @@
 #define NUM_MAX_REQUESTS 20
 
 struct RPT {
-    int16 pc_hashed;
+    u_int32_t pc;
     u_int32_t prev_addr;
-    int16  stride;
-    int state;
-}
+    u_int32_t stride;
+    u_int32_t state;
+} // reference prediction table.
 
 class Prefetcher {
     private:
