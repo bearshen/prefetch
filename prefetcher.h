@@ -48,6 +48,7 @@ class Prefetcher {
          * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
          */
         void cpuRequest(Request req);
+        void addRepuest(u_int32_t addr);
 
 };
 

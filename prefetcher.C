@@ -40,19 +40,16 @@ void Prefetcher::cpuRequest(Request req) {
         rpt[index].prev_addr = req.addr;
         if (temp_stride == rpt[index].stride) {
             rpt[index].state++;
-            if (rpt[index].state <= 0) return; // previously mispredicted. 
+            if (rpt[index].state < 0) addRepuest(req.addr+16); // previously mispredicted. 
 
-            for (int n = 0; n < num_strides_prefetched; n++){
+            for (int n = 0; n < rpt[index].state; n++){
                 u_int32_t temp_addr = req.addr + rpt[index].stride * (n+1);
-                requests[(current_pending_request + num_requests + n) % NUM_MAX_REQUESTS].addr = temp_addr;
-                if (num_requests == NUM_MAX_REQUESTS) {
-                    current_pending_request = (current_pending_request + 1 ) % NUM_MAX_REQUESTS;
-                } else {
-                    num_requests ++;
-                }
+                addRepuest(temp_addr);
             }
-        } else {
+        } 
+        else {
             rpt[index].state = -1; // mispredicted. 
+            addRepuest(req.addr+16);
         }
     }
     else {
@@ -61,6 +58,25 @@ void Prefetcher::cpuRequest(Request req) {
         rpt[oldest_rpt].state = 0;
         rpt[oldest_rpt].stride = 4; // default value, size of a byte. 
         oldest_rpt = (oldest_rpt + 1) % NUM_RPT_ENTRIES;
+        addRepuest(req.addr+16);
     }
 }
+
+void Prefetcher::addRepuest(u_int32_t addr){
+    if(num_requests != NUM_MAX_REQUESTS){
+        requests[(current_pending_request + num_requests) % NUM_MAX_REQUESTS].addr = addr;
+        num_requests ++ ;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
 
