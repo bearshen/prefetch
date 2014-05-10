@@ -23,7 +23,7 @@ struct RPT {
 } ;// reference prediction table.
 
 
-const static int num_strides_prefetched = 2;
+const static int num_strides_prefetched = 3;
 class Prefetcher {
     private:
         int num_requests;

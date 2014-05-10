@@ -56,6 +56,7 @@ void Prefetcher::cpuRequest(Request req) {
         }
     }
     else {
+        rpt[oldest_rpt].pc = req.pc;
         rpt[oldest_rpt].prev_addr = req.addr;
         rpt[oldest_rpt].state = 0;
         rpt[oldest_rpt].stride = 4; // default value, size of a byte. 
