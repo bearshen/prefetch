@@ -19,7 +19,7 @@ struct RPT {
     u_int32_t pc;
     u_int32_t prev_addr;
     u_int32_t stride;
-    u_int32_t state;
+    int32_t state;
 } ;// reference prediction table.
 
 
@@ -30,7 +30,7 @@ class Prefetcher {
         Request requests[NUM_MAX_REQUESTS];
         RPT rpt[NUM_RPT_ENTRIES];
         int current_pending_request;
-        int rear_request;
+		int oldest_rpt;
         int num_strides_prefetched = 2;
     public:
         Prefetcher();
@@ -49,7 +49,7 @@ class Prefetcher {
         * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
         */
        void cpuRequest(Request req);
-       bool isFull();
-    };
+
+};
 
 #endif
