@@ -23,6 +23,7 @@ struct RPT {
 } ;// reference prediction table.
 
 
+const static int num_strides_prefetched = 2;
 class Prefetcher {
     private:
         int num_requests;
@@ -30,11 +31,9 @@ class Prefetcher {
         Request requests[NUM_MAX_REQUESTS];
         RPT rpt[NUM_RPT_ENTRIES];
         int current_pending_request;
-		int oldest_rpt;
-        int num_strides_prefetched = 2;
+        int oldest_rpt;
     public:
         Prefetcher();
-
         // should return true if a request is ready for this cycle
         bool hasRequest(u_int32_t cycle);
 
@@ -44,11 +43,11 @@ class Prefetcher {
         // this function is called whenever the last prefetcher request was successfully sent to the L2
         void completeRequest(u_int32_t cycle);
 
-       /*
-        * This function is called whenever the CPU references memory.
-        * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
-        */
-       void cpuRequest(Request req);
+        /*
+         * This function is called whenever the CPU references memory.
+         * Note that only the addr, pc, load, issuedAt, and HitL1 should be considered valid data
+         */
+        void cpuRequest(Request req);
 
 };
 
