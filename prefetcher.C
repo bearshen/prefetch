@@ -40,7 +40,7 @@ void Prefetcher::cpuRequest(Request req) {
         rpt[index].prev_addr = req.addr;
         if (temp_stride == rpt[index].stride) { // stride hit
             rpt[index].state++;
-            if (rpt[index].state > 0) {
+            if (rpt[index].state > 2) {
                 if (rpt[index].state >= REQUEST_CUTOFF && req.HitL1 == true) {
                     // do nothing, we have fetched enough
                 } else {
@@ -49,6 +49,9 @@ void Prefetcher::cpuRequest(Request req) {
                         addRequest(temp_addr);                  
                     }
                 }
+            } else {
+                addRequest(req.addr+32);
+                addRequest(req.addr+64);
             }
         } 
         // else does not fetch at all. set state to false.
@@ -62,11 +65,10 @@ void Prefetcher::cpuRequest(Request req) {
         rpt[oldest_rpt].state = 0;
         rpt[oldest_rpt].stride = 4; // default value, size of a byte. 
         oldest_rpt = (oldest_rpt + 1) % NUM_RPT_ENTRIES;
+        addRequest(req.addr+32);
+        addRequest(req.addr+64);
     }
     // some form of stream prefetcher.
-    addRequest(req.addr+32);
-    addRequest(req.addr+64);
-    addRequest(req.addr+128);
 }
 
 void Prefetcher::addRequest(u_int32_t addr){

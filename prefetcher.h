@@ -12,9 +12,9 @@
 #include <sys/types.h>
 #include "mem-sim.h"
 
-#define NUM_RPT_ENTRIES 512
-#define NUM_MAX_REQUESTS 20
-#define REQUEST_CUTOFF 10
+#define NUM_RPT_ENTRIES 256 
+#define NUM_MAX_REQUESTS 80
+#define REQUEST_CUTOFF 40 
 struct RPT {
     u_int32_t pc;
     u_int32_t prev_addr;
