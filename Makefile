@@ -1,6 +1,9 @@
 CC = g++
 CCFLAGS = -g
 
+cacheSim-markov: CPU.o cache.o main.o memQueue.o prefetcher-markov.o
+	${CC} ${CCFLAGS} CPU.o cache.o main.o memQueue.o prefetcher-markov.o -o cacheSim
+	
 cacheSim: CPU.o cache.o main.o memQueue.o prefetcher.o
 	${CC} ${CCFLAGS} CPU.o cache.o main.o memQueue.o prefetcher.o -o cacheSim
 
@@ -19,5 +22,8 @@ memQueue.o: memQueue.C memQueue.h mem-sim.h cache.h
 prefetcher.o: prefetcher.C prefetcher.h mem-sim.h
 	${CC} ${CCFLAGS} -c prefetcher.C
 
+prefetcher-markov.o: prefetcher-markov.C prefetcher-markov.h mem-sim.h
+	${CC} ${CCFLAGS} -c prefetcher-markov.C
+	
 clean:
 	rm -f *.o cacheSim
