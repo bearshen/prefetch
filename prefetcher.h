@@ -15,7 +15,7 @@
 #define NUM_RPT_ENTRIES 128 
 #define NUM_MAX_REQUESTS 40 
 #define REQUEST_CUTOFF 20
-#define DEFAULT_STREAMSIZE 8 
+#define DEFAULT_STREAMSIZE 2
 
 struct RPT {
     u_int32_t pc;
@@ -50,7 +50,7 @@ class Prefetcher {
          */
         void cpuRequest(Request req);
         void addRequest(u_int32_t addr);
-
+        bool ifAlreadyInQueue(u_int32_t addr);
 };
 
 #endif

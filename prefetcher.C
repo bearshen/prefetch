@@ -40,14 +40,27 @@ void Prefetcher::cpuRequest(Request req) {
         rpt[index].prev_addr = req.addr;
         if (temp_stride == rpt[index].stride) { // stride hit
             rpt[index].state++;
-            if (rpt[index].state > 0) {
+            if (rpt[index].state > 2) {
                 if (rpt[index].state >= REQUEST_CUTOFF && req.HitL1 == true) {
                     // do nothing, we have fetched enough
                 } else {
+                    if(rpt[index].stride <= 32){
+                    for (int n = 1; n <= rpt[index].state && n <= REQUEST_CUTOFF; n++){
+                        u_int32_t temp_addr = req.addr + 32 * n;
+                        addRequest(temp_addr);
+                    
+                    }
+                }
+                else{
                     for (int n = 1; n <= rpt[index].state && n <= REQUEST_CUTOFF; n++){
                         u_int32_t temp_addr = req.addr + rpt[index].stride * n;
                         addRequest(temp_addr);                  
                     }
+                }
+                    // for (int n = 1; n <= rpt[index].state && n <= REQUEST_CUTOFF; n++){
+                    //     u_int32_t temp_addr = req.addr + rpt[index].stride * n;
+                    //     addRequest(temp_addr);                  
+                    // }
                 }
             } else {
                 for (int i = 0; i < DEFAULT_STREAMSIZE; ++i) {
@@ -58,6 +71,10 @@ void Prefetcher::cpuRequest(Request req) {
         // else does not fetch at all. set state to false.
         else {
             rpt[index].state = -1; // misprediction
+            for (int i = 0; i < DEFAULT_STREAMSIZE; ++i) {
+                    addRequest(req.addr + 32 * (i+1));
+                }
+
         }
     }
     else {
@@ -75,10 +92,20 @@ void Prefetcher::cpuRequest(Request req) {
 }
 
 void Prefetcher::addRequest(u_int32_t addr){
-    if(num_requests != NUM_MAX_REQUESTS){
+    if(num_requests != NUM_MAX_REQUESTS && !ifAlreadyInQueue(addr)){
         requests[(current_pending_request + num_requests) % NUM_MAX_REQUESTS].addr = addr; 
         num_requests ++ ;
     }
+}
+
+bool Prefetcher::ifAlreadyInQueue(u_int32_t addr) {
+  u_int32_t i;
+  for (i = current_pending_request; i % NUM_MAX_REQUESTS < (current_pending_request + num_requests) % NUM_MAX_REQUESTS; i++) {
+    if (requests[i % NUM_MAX_REQUESTS].addr/ 32 == addr / 32) {
+      return true;
+    }
+  }
+  return false;
 }
 
 
