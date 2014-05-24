@@ -73,7 +73,7 @@ void Prefetcher::cpuRequest(Request req) {
 
 void Prefetcher::addRequest(u_int32_t addr){
     if(num_requests != NUM_MAX_REQUESTS){
-        requests[(current_pending_request + num_requests) % NUM_MAX_REQUESTS].addr = addr & 0xFFFFFFE0; // addr with last 32 bits set to zero. 
+        requests[(current_pending_request + num_requests) % NUM_MAX_REQUESTS].addr = addr; 
         num_requests ++ ;
     }
 }
