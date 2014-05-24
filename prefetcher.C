@@ -38,36 +38,23 @@ void Prefetcher::cpuRequest(Request req) {
         u_int32_t temp_stride = rpt[index].stride;
         rpt[index].stride = req.addr - rpt[index].prev_addr;
         rpt[index].prev_addr = req.addr;
-        if (temp_stride == rpt[index].stride) {
+        if (temp_stride == rpt[index].stride) { // stride hit
             rpt[index].state++;
-            //if (rpt[index].state < 0) 
-            if (rpt[index].state <= 0){
-                addRequest(req.addr+32);
-                addRequest(req.addr+64);
-                addRequest(req.addr+128);
-            } // previously mispredicted. 
-            else{
-                if(rpt[index].stride <= 32){
-                    for (int n = 1; n <= rpt[index].state && n <= REQUEST_CUTOFF; n++){
-                        u_int32_t temp_addr = req.addr + 32 * n;
-                        addRequest(temp_addr);
-                    
-                    }
-                }
-                else{
-                    for (int n = 1; n <= rpt[index].state && n <= REQUEST_CUTOFF; n++){
-                        u_int32_t temp_addr = req.addr + rpt[index].stride * n;
-                        addRequest(temp_addr);                  
-                    }
-                }
+            if (rpt[index].state > 0) {
+				if (rpt[index].state >= REQUEST_CUTOFF && req.HitL1 == true) {
+					// do nothing, we have fetched enough
+				} else {
+					for (int n = 1; n <= rpt[index].state && n <= REQUEST_CUTOFF; n++){
+						u_int32_t temp_addr = req.addr + rpt[index].stride * n;
+						addRequest(temp_addr);                  
+					}
+				}
             }
         } 
-        else {
-            rpt[index].state = -1; // mispredicted.             
-            addRequest(req.addr+32);
-            addRequest(req.addr+64);
-            addRequest(req.addr+128);
-        }
+		// else does not fetch at all. set state to false.
+		else {
+			rpt[index].state = -1; // misprediction
+		}
     }
     else {
         rpt[oldest_rpt].pc = req.pc;
@@ -75,20 +62,19 @@ void Prefetcher::cpuRequest(Request req) {
         rpt[oldest_rpt].state = 0;
         rpt[oldest_rpt].stride = 4; // default value, size of a byte. 
         oldest_rpt = (oldest_rpt + 1) % NUM_RPT_ENTRIES;
-        
-        addRequest(req.addr+32);
-        addRequest(req.addr+64);
-        addRequest(req.addr+128);
     }
+	// some form of stream prefetcher.
+    addRequest(req.addr+32);
+    addRequest(req.addr+64);
+    addRequest(req.addr+128);
 }
 
 void Prefetcher::addRequest(u_int32_t addr){
     if(num_requests != NUM_MAX_REQUESTS){
-        requests[(current_pending_request + num_requests) % NUM_MAX_REQUESTS].addr = addr;
+        requests[(current_pending_request + num_requests) % NUM_MAX_REQUESTS].addr = addr & 0xFFFFFFE0; // addr with last 32 bits set to zero. 
         num_requests ++ ;
     }
 }
-
 
 
 
