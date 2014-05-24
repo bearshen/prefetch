@@ -14,7 +14,7 @@
 
 #define NUM_RPT_ENTRIES 512
 #define NUM_MAX_REQUESTS 20
-
+#define REQUEST_CUTOFF 10
 struct RPT {
     u_int32_t pc;
     u_int32_t prev_addr;
