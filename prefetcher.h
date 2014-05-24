@@ -12,9 +12,11 @@
 #include <sys/types.h>
 #include "mem-sim.h"
 
-#define NUM_RPT_ENTRIES 256 
-#define NUM_MAX_REQUESTS 80
-#define REQUEST_CUTOFF 40 
+#define NUM_RPT_ENTRIES 128 
+#define NUM_MAX_REQUESTS 40 
+#define REQUEST_CUTOFF 20
+#define DEFAULT_STREAMSIZE 8 
+
 struct RPT {
     u_int32_t pc;
     u_int32_t prev_addr;
@@ -23,7 +25,6 @@ struct RPT {
 } ;// reference prediction table.
 
 
-const static int num_strides_prefetched = 12;
 class Prefetcher {
     private:
         int num_requests;
